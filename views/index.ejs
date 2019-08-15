@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-	<title><%= title %></title>
+	<title></title>
 	<!-- Required meta tags -->
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -18,48 +18,51 @@
 	<script src="javascripts/custom.js"></script>
 </head>
 
-<body>
-	<div class="container-fluid bg-info">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h3><span class="label label-warning" id="qid">2</span> THREE is CORRECT</h3>
-				</div>
-				<div class="modal-body">
-					<div class="col-xs-3 col-xs-offset-5">
-						<div id="loadbar" style="display: none;">
-							<div class="blockG" id="rotateG_01"></div>
-							<div class="blockG" id="rotateG_02"></div>
-							<div class="blockG" id="rotateG_03"></div>
-							<div class="blockG" id="rotateG_04"></div>
-							<div class="blockG" id="rotateG_05"></div>
-							<div class="blockG" id="rotateG_06"></div>
-							<div class="blockG" id="rotateG_07"></div>
-							<div class="blockG" id="rotateG_08"></div>
-						</div>
-					</div>
-
-					<div class="quiz" id="quiz" data-toggle="buttons">
-						<label class="element-animation1 btn btn-lg btn-primary btn-block"><span class="btn-label"><i class="glyphicon glyphicon-chevron-right"></i></span> <input type="radio" name="q_answer" value="1">1
-							One</label>
-						<label class="element-animation2 btn btn-lg btn-primary btn-block"><span class="btn-label"><i class="glyphicon glyphicon-chevron-right"></i></span> <input type="radio" name="q_answer" value="2">2
-							Two</label>
-						<label class="element-animation3 btn btn-lg btn-primary btn-block"><span class="btn-label"><i class="glyphicon glyphicon-chevron-right"></i></span> <input type="radio" name="q_answer" value="3">3
-							Three</label>
-						<label class="element-animation4 btn btn-lg btn-primary btn-block"><span class="btn-label"><i class="glyphicon glyphicon-chevron-right"></i></span> <input type="radio" name="q_answer" value="4">4
-							Four</label>
+<body class="bg-info"">
+	<div class=" container container-fluid">
+	<div class="row">
+		<div class="row">
+			<div class="row">
+				<h3><span class="label label-warning" id="qid"><%=data[0].quesID%></span> <%=data[0].questionContent%></h3>
+			</div>
+			<div class="row">
+				<div class="col-xs-3 col-xs-offset-5">
+					<div id="loadbar" style="display: none;">
+						<div class="blockG" id="rotateG_01"></div>
+						<div class="blockG" id="rotateG_02"></div>
+						<div class="blockG" id="rotateG_03"></div>
+						<div class="blockG" id="rotateG_04"></div>
+						<div class="blockG" id="rotateG_05"></div>
+						<div class="blockG" id="rotateG_06"></div>
+						<div class="blockG" id="rotateG_07"></div>
+						<div class="blockG" id="rotateG_08"></div>
 					</div>
 				</div>
-				<div class="modal-footer text-muted">
-					<span id="answer"></span>
+
+				<div class="quiz" id="quiz" data-toggle="buttons">
+					<!-- <label class="element-animation1 btn btn-lg btn-primary btn-block"><span class="btn-label"><i class="glyphicon glyphicon-chevron-right"></i></span> <input type="radio" name="q_answer" value="1">
+						<p>The msg variable becomes function expression in the above example. So, you can invoke the function using parenthesis (). Run the above example and see the output as shown below.</p>
+					</label>
+					<label class="element-animation2 btn btn-lg btn-primary btn-block"><span class="btn-label"><i class="glyphicon glyphicon-chevron-right"></i></span> <input type="radio" name="q_answer" value="2">2
+						Two</label>
+					<label class="element-animation3 btn btn-lg btn-primary btn-block"><span class="btn-label"><i class="glyphicon glyphicon-chevron-right"></i></span> <input type="radio" name="q_answer" value="3">3
+						Three</label>
+					<label class="element-animation4 btn btn-lg btn-primary btn-block"><span class="btn-label"><i class="glyphicon glyphicon-chevron-right"></i></span> <input type="radio" name="q_answer" value="4">4
+						Four</label> -->
+					<%data.forEach(function(index){%>
+					<label class="element-animation1 btn btn-lg btn-primary btn-block"><span class="btn-label"><i class="glyphicon glyphicon-chevron-right"></i></span> <input type="radio" name="q_answer" value=<%=index.ansID%>>
+						<input type="hidden" id="isTrue" value=<%=index.isCorrect%>>
+						<p><%=index.answerContent%></p>
+					</label>
+					<%})%>
 				</div>
-
-
-
+			</div>
+			<div class="row">
+				<span id="answer"></span>
 			</div>
 		</div>
 	</div>
-
+	</div>
 </body>
 
 </html>

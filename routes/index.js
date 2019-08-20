@@ -16,24 +16,48 @@ router.get('/', function (req, res, next) {
 	})
 });
 
-router.all('/:questionSet', function (req, res, next) {
-	let allData=[];
+// router.get('/:questionSet', function (req, res, next) {
+// 	let allData = [];
+// 	let getOnlyOneQuestion = [];
+// 	let i = 0;
+// 	let questionSet = req.params.questionSet;
+// 	let questionPromise = new Promise((resolve, reject) => {
+// 		db.all('SELECT id, content FROM tbl_question WHERE question_set = ?', [questionSet], (err, rows) => {
+// 			getOnlyOneQuestion = rows;
+// 			resolve(getOnlyOneQuestion);
+// 		})
+// 	})
+// 	let getAllPromise = new Promise((resolve, reject) => {
+// 		db.all('SELECT tbl_answer.is_correct isCorrect, tbl_question.id quesID, tbl_answer.id ansID, tbl_question.content questionContent, tbl_answer.content answerContent FROM tbl_answer, tbl_question WHERE tbl_question.id = tbl_answer.question_id AND question_set=?', [questionSet], (err, rows) => {
+// 			allData = rows;
+// 			resolve(allData);
+// 		})
+// 	})
+// 	getAllPromise.then((result) => {
+// 		res.render('index', { questionSet: questionSet, i: i, getOnlyOneQuestion: getOnlyOneQuestion, allData: allData });
+// 	})
+// })
+
+router.get('/:questionSet/:iVariable', function (req, res, next) {
+	let allData = [];
 	let getOnlyOneQuestion = [];
+	let i = parseInt(req.params.iVariable);
 	let questionSet = req.params.questionSet;
-	let questionPromise = new Promise((resolve, reject)=>{
+	console.log('questionSet: ' + questionSet + ', i: ' + i);
+	let questionPromise = new Promise((resolve, reject) => {
 		db.all('SELECT id, content FROM tbl_question WHERE question_set = ?', [questionSet], (err, rows) => {
-			getOnlyOneQuestion=rows;
+			getOnlyOneQuestion = rows;
 			resolve(getOnlyOneQuestion);
 		})
 	})
 	let getAllPromise = new Promise((resolve, reject) => {
 		db.all('SELECT tbl_answer.is_correct isCorrect, tbl_question.id quesID, tbl_answer.id ansID, tbl_question.content questionContent, tbl_answer.content answerContent FROM tbl_answer, tbl_question WHERE tbl_question.id = tbl_answer.question_id AND question_set=?', [questionSet], (err, rows) => {
-			allData=rows;
+			allData = rows;
 			resolve(allData);
 		})
 	})
-	getAllPromise.then((result)=>{
-		res.render('index', { getOnlyOneQuestion: getOnlyOneQuestion, allData: allData });
+	getAllPromise.then((result) => {
+		res.render('index', { questionSet: questionSet, i: i, getOnlyOneQuestion: getOnlyOneQuestion, allData: allData });
 	})
 })
 

@@ -15,6 +15,10 @@ label.btn {
     -o-transition-duration: .3s
 }
 
+label.x {
+    padding: 18px 80px;
+}
+
 label.btn:hover {
     text-shadow: 0 3px 2px rgba(0,0,0,0.4);
     -webkit-transform: scale(1.1);

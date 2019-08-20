@@ -47,7 +47,7 @@
 				</div>
 				<div class="quiz" id="quiz" data-toggle="buttons">
 					<%allData.forEach(function(index){ if(index.quesID === getOnlyOneQuestion[i].id ){%>
-					<label class="element-animation1 x radio-inline btn-lg btn-primary btn-block"><input type="radio" name="q_answer" value=<%=index.ansID%>><span class="btn-label"><i class="glyphicon glyphicon-chevron-right"></i></span> 
+					<label class="element-animation1 btn btn-lg btn-primary btn-block"><span class="btn-label"><i class="glyphicon glyphicon-chevron-right"></i></span> <input type="radio" name="q_answer" value=<%=index.ansID%>>
 						<input type="hidden" id="isTrue" value=<%=index.isCorrect%>>
 						<p><%=index.answerContent%></p>
 					</label>
@@ -57,12 +57,7 @@
 			<hr>
 			<div class="row">
 				<span id="answer"></span>
-				<!-- <button id="idQuestion" class="pull-right btn btn-primary">Next</button> -->
-				<% var x = i; y=i-1; console.log(x++); %>
-				<div class="pull-right btn-group">
-					<a href="/<%=questionSet%>/<%=y %>" class="btn btn-default">Prev</a>
-					<a href="/<%=questionSet%>/<%=x++ %>" class="btn btn-primary">Next</a>
-				</div>
+				<button id="idQuestion" class="pull-right btn btn-primary">Next</button>
 			</div>
 		</div>
 	</div>

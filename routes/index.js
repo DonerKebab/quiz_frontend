@@ -3,24 +3,63 @@ var sqlite3 = require('sqlite3').verbose();
 
 var router = express.Router();
 
-var db = new sqlite3.Database('./aws_question (2).sqlite');
+var db = new sqlite3.Database('./routes/aws_question (1).sqlite');
 
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
-	// let data = [];
-	// db.each('SELECT id FROM tbl_question', (err, row) => {
-	// 	if (err) {
-	// 		return console.log(err.message);
-	// 	}
-	db.all('SELECT tbl_answer.is_correct isCorrect, tbl_question.id quesID, tbl_answer.id ansID, tbl_question.content questionContent, tbl_answer.content answerContent FROM tbl_answer, tbl_question WHERE tbl_question.id = tbl_answer.question_id AND question_id=?', [20], (err, row) => {
+	db.all('SELECT tbl_answer.is_correct isCorrect, tbl_question.id quesID, tbl_answer.id ansID, tbl_question.content questionContent, tbl_answer.content answerContent FROM tbl_answer, tbl_question WHERE tbl_question.id = tbl_answer.question_id AND question_set=?', [20], (err, row) => {
 		if (err) {
 			return console.log(err.message);
 		}
-		res.render('index', { data: row });
+		// res.render('index', { data: row });
 	})
-	// })
 });
+
+// router.get('/:questionSet', function (req, res, next) {
+// 	let allData = [];
+// 	let getOnlyOneQuestion = [];
+// 	let i = 0;
+// 	let questionSet = req.params.questionSet;
+// 	let questionPromise = new Promise((resolve, reject) => {
+// 		db.all('SELECT id, content FROM tbl_question WHERE question_set = ?', [questionSet], (err, rows) => {
+// 			getOnlyOneQuestion = rows;
+// 			resolve(getOnlyOneQuestion);
+// 		})
+// 	})
+// 	let getAllPromise = new Promise((resolve, reject) => {
+// 		db.all('SELECT tbl_answer.is_correct isCorrect, tbl_question.id quesID, tbl_answer.id ansID, tbl_question.content questionContent, tbl_answer.content answerContent FROM tbl_answer, tbl_question WHERE tbl_question.id = tbl_answer.question_id AND question_set=?', [questionSet], (err, rows) => {
+// 			allData = rows;
+// 			resolve(allData);
+// 		})
+// 	})
+// 	getAllPromise.then((result) => {
+// 		res.render('index', { questionSet: questionSet, i: i, getOnlyOneQuestion: getOnlyOneQuestion, allData: allData });
+// 	})
+// })
+
+router.get('/:questionSet/:iVariable', function (req, res, next) {
+	let allData = [];
+	let getOnlyOneQuestion = [];
+	let i = parseInt(req.params.iVariable);
+	let questionSet = req.params.questionSet;
+	console.log('questionSet: ' + questionSet + ', i: ' + i);
+	let questionPromise = new Promise((resolve, reject) => {
+		db.all('SELECT id, content FROM tbl_question WHERE question_set = ?', [questionSet], (err, rows) => {
+			getOnlyOneQuestion = rows;
+			resolve(getOnlyOneQuestion);
+		})
+	})
+	let getAllPromise = new Promise((resolve, reject) => {
+		db.all('SELECT tbl_answer.is_correct isCorrect, tbl_question.id quesID, tbl_answer.id ansID, tbl_question.content questionContent, tbl_answer.content answerContent FROM tbl_answer, tbl_question WHERE tbl_question.id = tbl_answer.question_id AND question_set=?', [questionSet], (err, rows) => {
+			allData = rows;
+			resolve(allData);
+		})
+	})
+	getAllPromise.then((result) => {
+		res.render('index', { questionSet: questionSet, i: i, getOnlyOneQuestion: getOnlyOneQuestion, allData: allData });
+	})
+})
 
 router.post('/:testId/:questionId/:answerId/:isCorrect', function (req, res, next) {
 	let testId = req.params.testId;

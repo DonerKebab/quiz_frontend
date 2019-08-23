@@ -5,20 +5,43 @@ var utils = require("./utils")
 
 
 /* GET home page. */
-router.use('/quiz/:testId/:setId', async (req, res, next) => {
-	console.log('method' + req.method)
+router.use('/quiz/:testId/:setId/:questionId?', async (req, res, next) => {
+	console.log('method: ' + req.method)
 	let setId = req.params.setId
 	let testId = req.params.testId
-	let prevQuestionId = [];
+	let reqQuestionId = req.params.questionId;
 	if (req.method === 'GET') {
-		// load the 1st question and answer in set
-		let queryFirstQuestion = `select * from tbl_question where question_set = ${setId} LIMIT 1`
-		let firstQuestion = await utils.selectDB(queryFirstQuestion)
-		let questionId = parseInt(firstQuestion[0]['id'])
-		prevQuestionId.push(questionId)
-		let getListAnswers = `select * from tbl_answer where question_id = ${questionId}`
-		let answersBelong = await utils.selectDB(getListAnswers);
-		res.render('index', { testId: testId, questionSet: setId, question: firstQuestion[0], answers: answersBelong });
+		if (reqQuestionId === undefined) {
+			var queryFirstQuestion = `select * from tbl_question where question_set = ${setId} LIMIT 1`
+			var firstQuestion = await utils.selectDB(queryFirstQuestion)
+			var questionId = parseInt(firstQuestion[0]['id'])
+			var prevQuestionId = undefined;
+			// load the 1st question and answer in set
+			let getListAnswers = `select * from tbl_answer where question_id = ${questionId}`
+			let answersBelong = await utils.selectDB(getListAnswers);
+			res.render('index', { prevQuestionId: prevQuestionId, testId: testId, questionSet: setId, question: firstQuestion[0], answers: answersBelong });
+		} else {
+			// get distinct question from choice with test_id
+			var questionId = parseInt(reqQuestionId)
+			var queryAllQuestionInChoice = `select min(question_id) as id from tbl_choice where test_id=${testId} group by question_id`
+			var allQuestionInChoice = await utils.selectDB(queryAllQuestionInChoice)
+			// get prev question
+			for (let i = 1; i < allQuestionInChoice.length; i++) {
+				if (questionId == allQuestionInChoice[i].id) {
+					var prevQuestionId = allQuestionInChoice[i - 1].id;
+					break;
+				}
+			}
+			// get in4 of prev question
+			var queryPrevQuestion = `select * from tbl_question where id = ${questionId}`
+			var prevQuestion = await utils.selectDB(queryPrevQuestion)
+			console.log(JSON.stringify(prevQuestion))
+			// load the 1st question and answer in set
+			let getListAnswers = `select * from tbl_answer where question_id = ${questionId}`
+			let answersBelong = await utils.selectDB(getListAnswers);
+			res.render('index', { prevQuestionId: prevQuestionId, testId: testId, questionSet: setId, question: prevQuestion[0], answers: answersBelong });
+		}
+
 	}
 	if (req.method === 'POST') {
 		// get list answer after student choose
@@ -52,7 +75,6 @@ router.use('/quiz/:testId/:setId', async (req, res, next) => {
 		let nextQuestion = await utils.selectDB(queryNextQuestion);
 		if (nextQuestion.length != 0) {
 			let nextQuestionId = parseInt(nextQuestion[0]['id'])
-			prevQuestionId.push(nextQuestionId)
 			let getNextListAnswers = `select * from tbl_answer where question_id = ${nextQuestionId}`
 			let nextAnswersBelong = await utils.selectDB(getNextListAnswers)
 			res.render('index', { prevQuestionId: currentQuestionId, testId: testId, questionSet: setId, question: nextQuestion[0], answers: nextAnswersBelong });

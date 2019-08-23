@@ -6,66 +6,53 @@
 	<!-- Required meta tags -->
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
 	<!-- Bootstrap CSS -->
 	<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-
-	<link rel="stylesheet" href="/stylesheets/style.css">
-
 	<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
 	<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
-
-	<script src="/javascripts/custom.js"></script>
 </head>
 
-<body class="bg-info"">
+<body>
 	<div class=" container container-fluid">
-	<div class="row">
-
-		<p id="id1"></p>
-		<input type="hidden" id="questionSet" value="<%= questionSet %>" />
-		<input type="hidden" id="iVariable" value="<%= i %>" />
 		<div class="row">
 			<div class="row">
-				<h3><span class="label label-warning" id="qid"><%=getOnlyOneQuestion[i].id%></span>
-					<%=getOnlyOneQuestion[i].content%>
-				</h3>
-			</div>
-			<hr>
-			<div class="row">
-				<div class="col-xs-3 col-xs-offset-5">
-					<div id="loadbar" style="display: none;">
-						<div class="blockG" id="rotateG_01"></div>
-						<div class="blockG" id="rotateG_02"></div>
-						<div class="blockG" id="rotateG_03"></div>
-						<div class="blockG" id="rotateG_04"></div>
-						<div class="blockG" id="rotateG_05"></div>
-						<div class="blockG" id="rotateG_06"></div>
-						<div class="blockG" id="rotateG_07"></div>
-						<div class="blockG" id="rotateG_08"></div>
+				<form method="POST" action="/quiz/<%=testId %>/<%=questionSet %>">
+					<div class="row">
+						<input type="hidden" name="questionId" value="<%=question.id%>">
+						<% if(typeof (prevQuestionId) != 'undefined'){ %>
+						<input type="hidden" name="prevQuestionId" value="<%=prevQuestionId%>">
+						<% } %>
+						<h3><span class="label label-warning" id="qid">
+								<%=question.id%></span>
+							<%=question.content%>
+						</h3>
 					</div>
-				</div>
-				<div class="quiz" id="quiz" data-toggle="buttons">
-					<%allData.forEach(function(index){ if(index.quesID === getOnlyOneQuestion[i].id ){%>
-					<label class="element-animation1 x radio-inline btn-lg btn-primary btn-block"><input type="radio" name="q_answer" value=<%=index.ansID%>><span class="btn-label"><i class="glyphicon glyphicon-chevron-right"></i></span> 
-						<input type="hidden" id="isTrue" value=<%=index.isCorrect%>>
-						<p><%=index.answerContent%></p>
-					</label>
-					<%}})%>
-				</div>
-			</div>
-			<hr>
-			<div class="row">
-				<span id="answer"></span>
-				<!-- <button id="idQuestion" class="pull-right btn btn-primary">Next</button> -->
-				<% var x = i; y=i-1; console.log(x++); %>
-				<div class="pull-right btn-group">
-					<a href="/<%=questionSet%>/<%=y %>" class="btn btn-default">Prev</a>
-					<a href="/<%=questionSet%>/<%=x++ %>" class="btn btn-primary">Next</a>
-				</div>
+					<hr>
+					<% if (question.num_ans > 1) { %>
+					<% for(let i=0; i< answers.length; i++) {%>
+					<div class="form-check">
+						<input class="form-check-input" type="checkbox" value="<%=answers[i].id%>" name="ans">
+						<label class="form-check-label" for="defaultCheck1">
+							<%= answers[i].content%>
+						</label>
+					</div>
+					<% } %>
+					<% } else { %>
+					<% for(let i=0; i< answers.length; i++) {%>
+					<div class="form-check">
+						<input class="form-check-input" type="radio" value="<%=answers[i].id%>" name="ans">
+						<label class="form-check-label" for="defaultCheck1">
+							<%= answers[i].content%>
+						</label>
+					</div>
+					<% } %>
+					<% } %>
+					<hr>
+					<button class="btn btn-default">Back</button>
+					<button type="submit" class="btn btn-primary">Next</button>
+				</form>
 			</div>
 		</div>
-	</div>
 	</div>
 </body>
 

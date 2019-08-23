@@ -19,9 +19,7 @@
 				<form method="POST" action="/quiz/<%=testId %>/<%=questionSet %>">
 					<div class="row">
 						<input type="hidden" name="questionId" value="<%=question.id%>">
-						<% if(typeof (prevQuestionId) != 'undefined'){ %>
-						<input type="hidden" name="prevQuestionId" value="<%=prevQuestionId%>">
-						<% } %>
+
 						<h3><span class="label label-warning" id="qid">
 								<%=question.id%></span>
 							<%=question.content%>
@@ -48,7 +46,9 @@
 					<% } %>
 					<% } %>
 					<hr>
-					<button class="btn btn-default">Back</button>
+					<% if(prevQuestionId != undefined){ %>
+					<a href="/quiz/<%=testId%>/<%=questionSet%>/<%=prevQuestionId%>" class="btn btn-default">Back</a>
+					<% } %>
 					<button type="submit" class="btn btn-primary">Next</button>
 				</form>
 			</div>

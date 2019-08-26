@@ -13,10 +13,20 @@ router.use('/quiz/:testId/:setId/:index?', async (req, res, next) => {
 	if (req.method === 'GET') {
 		let queryQuestion = `select * from (select ROW_NUMBER() OVER (ORDER BY id) n, * from tbl_question where question_set=${setId}) where n=${index}`
 		let question = await utils.selectDB(queryQuestion);
+		let questionId = parseInt(question[0]['id']);
+
 		// load the 1st question and answer in set
 		let getListAnswers = `select * from tbl_answer where question_id = ${question[0]['id']}`
 		let answersBelong = await utils.selectDB(getListAnswers);
-		res.render('test', { index: index, testId: testId, questionSet: setId, question: question[0], answers: answersBelong });
+		let queryCheckQuestionInChoice = `select answer_id from tbl_choice where question_id=${questionId} and test_id=${testId}`
+		let checkQuestionInChoice = await utils.selectDB(queryCheckQuestionInChoice)
+		console.log(checkQuestionInChoice);
+		if (checkQuestionInChoice.length != 0) {
+			res.render('test', { chosenAnswer: checkQuestionInChoice, index: index, testId: testId, questionSet: setId, question: question[0], answers: answersBelong });
+		}
+		else {
+			res.render('test', { chosenAnswer: [], index: index, testId: testId, questionSet: setId, question: question[0], answers: answersBelong });
+		}
 	}
 	if (req.method === 'POST') {
 		let questionId = req.body.questionId;

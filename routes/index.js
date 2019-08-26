@@ -17,7 +17,6 @@ router.use('/quiz/:testId/:setId/:index?', async (req, res, next) => {
 	// load the 1st question and answer in set
 	let getListAnswers = `select * from tbl_answer where question_id = ${question[0]['id']}`
 	let answersBelong = await utils.selectDB(getListAnswers);
-	index++;
 	res.render('test', { index: index, testId: testId, questionSet: setId, question: question[0], answers: answersBelong });
 
 });

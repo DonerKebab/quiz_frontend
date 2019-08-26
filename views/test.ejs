@@ -16,43 +16,44 @@
 	<div class=" container container-fluid">
 		<div class="row">
 			<div class="row">
-				<!-- <form method="GET" action="/quiz/<%=testId %>/<%=questionSet %>/<%=question.id %>"> -->
-				<div class="row">
-					<input type="hidden" name="questionId" value="<%=question.id%>">
+				<form method="POST" action="/quiz/<%=testId %>/<%=questionSet %>/<%=index %>">
+					<div class="row">
+						<input type="hidden" name="questionId" value="<%=question.id%>">
+						<input type="hidden" name="index" value="<%=index%>">
+						<h3><span class="label label-warning" id="qid">
+								<%=question.id%></span>
+							<%=question.content%>
+						</h3>
+					</div>
+					<hr>
+					<% if (question.num_ans > 1) { %>
+					<% for(let i=0; i< answers.length; i++) {%>
+					<div class="form-check">
+						<input class="form-check-input" type="checkbox" value="<%=answers[i].id%>" name="ans">
+						<label class="form-check-label" for="defaultCheck1">
+							<%= answers[i].content%>
+						</label>
+					</div>
+					<% } %>
+					<% } else { %>
+					<% for(let i=0; i< answers.length; i++) {%>
+					<div class="form-check">
+						<input class="form-check-input" type="radio" value="<%=answers[i].id%>" name="ans">
+						<label class="form-check-label" for="defaultCheck1">
+							<%= answers[i].content%>
+						</label>
+					</div>
+					<% } %>
+					<% } %>
+					<button type="submit" class="btn btn-primary">Answer</button>
 
-					<h3><span class="label label-warning" id="qid">
-							<%=question.id%></span>
-						<%=question.content%>
-					</h3>
-				</div>
-				<hr>
-				<% if (question.num_ans > 1) { %>
-				<% for(let i=0; i< answers.length; i++) {%>
-				<div class="form-check">
-					<input class="form-check-input" type="checkbox" value="<%=answers[i].id%>" name="ans">
-					<label class="form-check-label" for="defaultCheck1">
-						<%= answers[i].content%>
-					</label>
-				</div>
-				<% } %>
-				<% } else { %>
-				<% for(let i=0; i< answers.length; i++) {%>
-				<div class="form-check">
-					<input class="form-check-input" type="radio" value="<%=answers[i].id%>" name="ans">
-					<label class="form-check-label" for="defaultCheck1">
-						<%= answers[i].content%>
-					</label>
-				</div>
-				<% } %>
-				<% } %>
+				</form>
 				<hr>
 				<% var x = index; var y = index %>
 				<% if(x>1) {%>
 				<button onclick="location.href='/quiz/<%=testId %>/<%=questionSet %>/<%=--x %>'" type="button" class="btn btn-default">Back</button>
 				<% } %>
 				<button onclick="location.href='/quiz/<%=testId %>/<%=questionSet %>/<%=++y %>'" type="button" class="btn btn-primary">Next</button>
-				<!-- <button type="submit" class="btn btn-primary">Next</button> -->
-				<!-- </form> -->
 			</div>
 		</div>
 	</div>

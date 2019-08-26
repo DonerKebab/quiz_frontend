@@ -20,9 +20,21 @@ router.use('/quiz/:testId/:setId/:index?', async (req, res, next) => {
 		let answersBelong = await utils.selectDB(getListAnswers);
 		let queryCheckQuestionInChoice = `select answer_id from tbl_choice where question_id=${questionId} and test_id=${testId}`
 		let checkQuestionInChoice = await utils.selectDB(queryCheckQuestionInChoice)
+
+		let queryCheckQuestionNotInChoice = `select id
+		from tbl_answer 
+		where id 
+		not in (select answer_id 
+				from tbl_choice
+				where question_id= ${questionId} and test_id= ${testId})
+		and question_id = ${questionId}`
+		let checkQuestionNotInChoice = await utils.selectDB(queryCheckQuestionNotInChoice)
+
 		console.log(checkQuestionInChoice);
+		console.log(checkQuestionNotInChoice);
+		
 		if (checkQuestionInChoice.length != 0) {
-			res.render('test', { chosenAnswer: checkQuestionInChoice, index: index, testId: testId, questionSet: setId, question: question[0], answers: answersBelong });
+			res.render('test', { chosenAnswer: checkQuestionInChoice, notChosenAnswer: checkQuestionNotInChoice, index: index, testId: testId, questionSet: setId, question: question[0], answers: answersBelong });
 		}
 		else {
 			res.render('test', { chosenAnswer: [], index: index, testId: testId, questionSet: setId, question: question[0], answers: answersBelong });

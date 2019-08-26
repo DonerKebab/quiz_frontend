@@ -19,6 +19,13 @@ router.use('/quiz/:testId/:setId/:index?', async (req, res, next) => {
 		res.render('test', { index: index, testId: testId, questionSet: setId, question: question[0], answers: answersBelong });
 	}
 	if (req.method === 'POST') {
+		let questionId = req.body.questionId;
+		let queryCheckQuestionInChoice = `select count(id) as n from tbl_choice where question_id=${questionId}`
+		let checkQuestionInChoice = await utils.getDB(queryCheckQuestionInChoice)
+		if (checkQuestionInChoice.n !== 0) {
+			let queryDeleteQuestionInChoice = `delete from tbl_choice where question_id=${questionId}`
+			await utils.runDB(queryDeleteQuestionInChoice)
+		}
 		// get list answer after student choose
 		let answerPickedCheck = req.body.ans; // check ans is radio or checkbox
 		let answerPicked = [];
@@ -29,7 +36,6 @@ router.use('/quiz/:testId/:setId/:index?', async (req, res, next) => {
 		}
 		// get list is_correct of list answer
 		// save student's answer to tbl_choice
-		let questionId = req.body.questionId;
 		let isTrue;
 		for (let i = 0; i < answerPicked.length; i++) {
 			let getListAnswers = `select * from tbl_answer where id = ${answerPicked[i]}`

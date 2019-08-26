@@ -20,7 +20,7 @@ router.use('/quiz/:testId/:setId/:index?', async (req, res, next) => {
 	}
 	if (req.method === 'POST') {
 		let questionId = req.body.questionId;
-		let queryCheckQuestionInChoice = `select count(id) as n from tbl_choice where question_id=${questionId}`
+		let queryCheckQuestionInChoice = `select count(id) as n from tbl_choice where question_id=${questionId} and test_id=${testId}`
 		let checkQuestionInChoice = await utils.getDB(queryCheckQuestionInChoice)
 		if (checkQuestionInChoice.n !== 0) {
 			let queryDeleteQuestionInChoice = `delete from tbl_choice where question_id=${questionId}`

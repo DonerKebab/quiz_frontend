@@ -10,15 +10,60 @@ router.use('/quiz/:testId/:setId/:index?', async (req, res, next) => {
 	let setId = req.params.setId
 	let testId = req.params.testId
 	let index = req.params.index
-
-	let queryQuestion = `select * from (select ROW_NUMBER() OVER (ORDER BY id) n, * from tbl_question where question_set=${setId}) where n=${index}`
-	let question = await utils.selectDB(queryQuestion);
-
-	// load the 1st question and answer in set
-	let getListAnswers = `select * from tbl_answer where question_id = ${question[0]['id']}`
-	let answersBelong = await utils.selectDB(getListAnswers);
-	res.render('test', { index: index, testId: testId, questionSet: setId, question: question[0], answers: answersBelong });
-
+	if (req.method === 'GET') {
+		let queryQuestion = `select * from (select ROW_NUMBER() OVER (ORDER BY id) n, * from tbl_question where question_set=${setId}) where n=${index}`
+		let question = await utils.selectDB(queryQuestion);
+		// load the 1st question and answer in set
+		let getListAnswers = `select * from tbl_answer where question_id = ${question[0]['id']}`
+		let answersBelong = await utils.selectDB(getListAnswers);
+		res.render('test', { index: index, testId: testId, questionSet: setId, question: question[0], answers: answersBelong });
+	}
+	if (req.method === 'POST') {
+		// get list answer after student choose
+		let answerPickedCheck = req.body.ans; // check ans is radio or checkbox
+		let answerPicked = [];
+		if (typeof (answerPickedCheck) === 'string') {
+			answerPicked.push(parseInt(answerPickedCheck));
+		} else {
+			answerPicked = answerPickedCheck;
+		}
+		// get list is_correct of list answer
+		// save student's answer to tbl_choice
+		let questionId = req.body.questionId;
+		let isTrue;
+		for (let i = 0; i < answerPicked.length; i++) {
+			let getListAnswers = `select * from tbl_answer where id = ${answerPicked[i]}`
+			let answersBelong = await utils.getDB(getListAnswers);
+			isTrue = answersBelong.is_correct;
+			let queryChoice = `insert into tbl_choice (test_id, question_id, answer_id, is_correct) values(${testId}, ${questionId}, ${answerPicked[i]}, ${isTrue})`;
+			await utils.runDB(queryChoice);
+		}
+		// get index to next question
+		let nextQuestion = parseInt(req.body.index);
+		let queryQuestion = `select * from (select ROW_NUMBER() OVER (ORDER BY id) n, * from tbl_question where question_set=${setId}) where n=${++nextQuestion}`
+		let question = await utils.selectDB(queryQuestion);
+		if (question.length != 0) {
+			res.redirect("/quiz/" + testId + "/" + setId + "/" + nextQuestion++)
+		} else {
+			// if the current question is end of set, then calculate score
+			let queryCountFalseQuestion = `SELECT COUNT(question_id) as num_wrong_ans
+											FROM (SELECT DISTINCT question_id FROM tbl_choice WHERE is_correct = 0 and test_id=${testId})`;
+			let countFalseQuestion = await utils.selectDB(queryCountFalseQuestion);
+			let queryTotalQuestion = `select count(id) as total_question from tbl_question where question_set=${setId}`
+			let totalQuestion = await utils.selectDB(queryTotalQuestion);
+			let countTrueQuestion = totalQuestion[0].total_question - countFalseQuestion[0].num_wrong_ans;
+			let truePercent = (countTrueQuestion / totalQuestion[0].total_question).toFixed(4) * 100;
+			if (truePercent >= 70) {
+				let queryUpdateTest = `update tbl_test set status='true', score=${truePercent}, result='passed' where id=${testId}`;
+				await utils.runDB(queryUpdateTest);
+				res.send('passed: ' + truePercent + '%');
+			} else {
+				let queryUpdateTest = `update tbl_test set status='false', score=${truePercent}, result='failed' where id=${testId}`;
+				await utils.runDB(queryUpdateTest);
+				res.send('failed: ' + truePercent + '%');
+			}
+		}
+	}
 });
 
 router.use('/take-quiz/:setId', async (req, res, next) => {

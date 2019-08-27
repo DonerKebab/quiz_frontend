@@ -21,7 +21,7 @@
 						<input type="hidden" name="questionId" value="<%=question.id%>">
 						<input type="hidden" name="index" value="<%=index%>">
 						<h3><span class="label label-warning" id="qid">
-								<%=question.id%></span>
+								<%=index%></span>
 							<%=question.content%>
 						</h3>
 					</div>
@@ -103,8 +103,10 @@
 				<button onclick="location.href='/quiz/<%=testId %>/<%=questionSet %>/<%=--x %>'" type="button"
 					class="btn btn-default">Back</button>
 				<% } %>
+				<% if (y!=count) { %>
 				<button onclick="location.href='/quiz/<%=testId %>/<%=questionSet %>/<%=++y %>'" type="button"
 					class="btn btn-primary">Next</button>
+				<% } %>
 			</div>
 		</div>
 	</div>

@@ -19,7 +19,7 @@ router.use('/quiz/:testId/:setId/:index?', async (req, res, next) => {
 		let getListAnswers = `select * from tbl_answer where question_id = ${question[0]['id']}`
 		let answersBelong = await utils.selectDB(getListAnswers);
 		let queryCheckQuestionInChoice = `select answer_id from tbl_choice where question_id=${questionId} and test_id=${testId}`
-		let checkQuestionInChoice = await utils.selectDB(queryCheckQuestionInChoice)
+		let checkQuestionInChoice = await utils.selectDB(queryCheckQuestionInChoice);
 
 		let queryCheckQuestionNotInChoice = `select id
 		from tbl_answer 
@@ -28,17 +28,16 @@ router.use('/quiz/:testId/:setId/:index?', async (req, res, next) => {
 				from tbl_choice
 				where question_id= ${questionId} and test_id= ${testId})
 		and question_id = ${questionId}`
-		let checkQuestionNotInChoice = await utils.selectDB(queryCheckQuestionNotInChoice)
+		let checkQuestionNotInChoice = await utils.selectDB(queryCheckQuestionNotInChoice);
+
+		let queryGetNumberOfQuestion = `select count(id) c from tbl_question where question_set = ${setId}`
+		let count = await utils.getDB(queryGetNumberOfQuestion)
+
 
 		console.log(checkQuestionInChoice);
 		console.log(checkQuestionNotInChoice);
-		
-		if (checkQuestionInChoice.length != 0) {
-			res.render('test', { chosenAnswer: checkQuestionInChoice, notChosenAnswer: checkQuestionNotInChoice, index: index, testId: testId, questionSet: setId, question: question[0], answers: answersBelong });
-		}
-		else {
-			res.render('test', { chosenAnswer: [], index: index, testId: testId, questionSet: setId, question: question[0], answers: answersBelong });
-		}
+
+		res.render('test', { chosenAnswer: checkQuestionInChoice, notChosenAnswer: checkQuestionNotInChoice, index: index, testId: testId, questionSet: setId, question: question[0], answers: answersBelong, count: count.c });
 	}
 	if (req.method === 'POST') {
 		let questionId = req.body.questionId;

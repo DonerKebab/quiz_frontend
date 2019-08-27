@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<title></title>
+	<!-- Required meta tags -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<!-- Bootstrap CSS -->
+	<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+	<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+	<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+</head>
+
+<body>
+	<div class=" container container-fluid">
+		<div class="row">
+			<div class="row">
+				<form method="POST" action="/quiz/<%=testId %>/<%=questionSet %>/<%=index %>">
+					<div class="row">
+						<input type="hidden" name="questionId" value="<%=question.id%>">
+						<input type="hidden" name="index" value="<%=index%>">
+						<h3><span class="label label-warning" id="qid">
+								<%=index%></span>
+							<%=question.content%>
+						</h3>
+					</div>
+					<hr>
+					<% if (question.num_ans > 1) { %>
+					<% for(let i=0; i< answers.length; i++) {%>
+					<% if(chosenAnswer.length === 0){ %>
+					<div class="form-check">
+						<input class="form-check-input" type="checkbox" value="<%=answers[i].id%>" name="ans">
+						<label class="form-check-label" for="defaultCheck1">
+							<%= answers[i].content%>
+						</label>
+					</div>
+					<% } else { %>
+					<% for(let j=0; j< chosenAnswer.length; j++) {%>
+					<% if(answers[i].id === chosenAnswer[j].answer_id){ %>
+					<div class="form-check">
+						<input class="form-check-input" type="checkbox" checked="checked" value="<%=answers[i].id%>"
+							name="ans">
+						<label class="form-check-label" for="defaultCheck1">
+							<%= answers[i].content%>
+						</label>
+					</div>
+					<% } %>
+					<% } %>
+					<% for(let j = 0; j < notChosenAnswer.length; j++) { %>
+						<% if (answers[i].id === notChosenAnswer[j].id) { %>
+							<div class="form-check">
+								<input class="form-check-input" type="checkbox" value="<%=answers[i].id%>"
+									name="ans">
+								<label class="form-check-label" for="defaultCheck1">
+									<%= answers[i].content%>
+								</label>
+							</div>
+						<% } %>
+					<% } %>
+					<% } %>
+					<% } %>
+					<% } else { %>
+					<% for(let i=0; i< answers.length; i++) {%>
+						<% if(chosenAnswer.length === 0){ %>
+						<div class="form-check">
+							<input class="form-check-input" type="radio" value="<%=answers[i].id%>" name="ans">
+							<label class="form-check-label" for="defaultCheck1">
+								<%= answers[i].content%>
+							</label>
+						</div>
+						<% } else { %>
+						<% for(let j=0; j< chosenAnswer.length; j++) {%>
+							<% if(answers[i].id === chosenAnswer[j].answer_id){ %>
+								<div class="form-check">
+									<input class="form-check-input" type="radio" checked="checked" value="<%=answers[i].id%>"
+										name="ans">
+									<label class="form-check-label" for="defaultCheck1">
+										<%= answers[i].content%>
+									</label>
+								</div>
+							<% } %>
+						<% } %>
+						<% for(let j = 0; j < notChosenAnswer.length; j++) { %>
+							<% if (answers[i].id === notChosenAnswer[j].id) { %>
+								<div class="form-check">
+									<input class="form-check-input" type="radio" value="<%=answers[i].id%>"
+										name="ans">
+									<label class="form-check-label" for="defaultCheck1">
+										<%= answers[i].content%>
+									</label>
+								</div>
+							<% } %>
+						<% } %>
+						<% } %>
+						<% } %>
+					<% } %>
+					<button type="submit" class="btn btn-primary">Answer</button>
+				</form>
+				<hr>
+				<% var x = index; var y = index %>
+				<% if(x>1) {%>
+				<button onclick="location.href='/quiz/<%=testId %>/<%=questionSet %>/<%=--x %>'" type="button"
+					class="btn btn-default">Back</button>
+				<% } %>
+				<% if (y!=count) { %>
+				<button onclick="location.href='/quiz/<%=testId %>/<%=questionSet %>/<%=++y %>'" type="button"
+					class="btn btn-primary">Next</button>
+				<% } %>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

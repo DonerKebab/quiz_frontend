@@ -1,7 +1,6 @@
-var express = require('express');
-var router = express.Router();
+var express = require('express')
+var router = express.Router()
 var utils = require("./utils")
-
 
 
 /* GET home page. */
@@ -67,28 +66,35 @@ router.use('/quiz/:testId/:setId/:index?', async (req, res, next) => {
 		// get list is_correct of list answer
 		// save student's answer to tbl_choice
 		let isTrue;
-		if (answerPicked != undefined) {
-			for (let i = 0; i < answerPicked.length; i++) {
-				let getListAnswers = `select * from tbl_answer where id = ${answerPicked[i]}`
-				let answersBelong = await utils.getDB(getListAnswers);
-				isTrue = answersBelong.is_correct;
-				let queryChoice = `insert into tbl_choice (test_id, question_id, answer_id, is_correct) values(${testId}, ${questionId}, ${answerPicked[i]}, ${isTrue})`;
-				await utils.runDB(queryChoice);
-			}
-		}
 		// get index to next question
 		let nextQuestion = parseInt(req.body.index);
-		let queryQuestion = `select * from (select ROW_NUMBER() OVER (ORDER BY id) n, * from tbl_question where question_set=${setId}) where n=${nextQuestion}`
 		let queryGetNumberOfQuestion = `select count(id) c from tbl_question where question_set = ${setId}`
 		let count = await utils.getDB(queryGetNumberOfQuestion)
+		let queryGetNumberOfAnswer = `select num_ans from tbl_question where id = ${questionId}`
+		let numberOfAnswer = await utils.getDB(queryGetNumberOfAnswer)
 
-		await utils.selectDB(queryQuestion);
-
-		if (nextQuestion != count.c) {
-			res.redirect("/quiz/" + testId + "/" + setId + "/" + (nextQuestion + 1));
+		if (answerPicked != undefined) {
+			if (answerPicked.length == numberOfAnswer.num_ans) {
+				for (let i = 0; i < answerPicked.length; i++) {
+					let getListAnswers = `select * from tbl_answer where id = ${answerPicked[i]}`
+					let answersBelong = await utils.getDB(getListAnswers);
+					isTrue = answersBelong.is_correct;
+					let queryChoice = `insert into tbl_choice (test_id, question_id, answer_id, is_correct) values(${testId}, ${questionId}, ${answerPicked[i]}, ${isTrue})`;
+					await utils.runDB(queryChoice);
+					if (nextQuestion != count.c) {
+						res.redirect("/quiz/" + testId + "/" + setId + "/" + (nextQuestion + 1));
+					} else {
+						res.redirect("/quiz/" + testId + "/" + setId + "/" + (nextQuestion));
+					}
+				}
+			} else {
+				res.redirect("/quiz/" + testId + "/" + setId + "/" + (nextQuestion));
+			}
 		} else {
 			res.redirect("/quiz/" + testId + "/" + setId + "/" + (nextQuestion));
 		}
+
+
 	}
 });
 

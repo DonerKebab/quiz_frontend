@@ -48,52 +48,50 @@
 					<% } %>
 					<% } %>
 					<% for(let j = 0; j < notChosenAnswer.length; j++) { %>
-						<% if (answers[i].id === notChosenAnswer[j].id) { %>
-							<div class="form-check">
-								<input class="form-check-input" type="checkbox" value="<%=answers[i].id%>"
-									name="ans">
-								<label class="form-check-label" for="defaultCheck1">
-									<%= answers[i].content%>
-								</label>
-							</div>
-						<% } %>
+					<% if (answers[i].id === notChosenAnswer[j].id) { %>
+					<div class="form-check">
+						<input class="form-check-input" type="checkbox" value="<%=answers[i].id%>" name="ans">
+						<label class="form-check-label" for="defaultCheck1">
+							<%= answers[i].content%>
+						</label>
+					</div>
+					<% } %>
 					<% } %>
 					<% } %>
 					<% } %>
 					<% } else { %>
 					<% for(let i=0; i< answers.length; i++) {%>
-						<% if(chosenAnswer.length === 0){ %>
-						<div class="form-check">
-							<input class="form-check-input" type="radio" value="<%=answers[i].id%>" name="ans">
-							<label class="form-check-label" for="defaultCheck1">
-								<%= answers[i].content%>
-							</label>
-						</div>
-						<% } else { %>
-						<% for(let j=0; j< chosenAnswer.length; j++) {%>
-							<% if(answers[i].id === chosenAnswer[j].answer_id){ %>
-								<div class="form-check">
-									<input class="form-check-input" type="radio" checked="checked" value="<%=answers[i].id%>"
-										name="ans">
-									<label class="form-check-label" for="defaultCheck1">
-										<%= answers[i].content%>
-									</label>
-								</div>
-							<% } %>
-						<% } %>
-						<% for(let j = 0; j < notChosenAnswer.length; j++) { %>
-							<% if (answers[i].id === notChosenAnswer[j].id) { %>
-								<div class="form-check">
-									<input class="form-check-input" type="radio" value="<%=answers[i].id%>"
-										name="ans">
-									<label class="form-check-label" for="defaultCheck1">
-										<%= answers[i].content%>
-									</label>
-								</div>
-							<% } %>
-						<% } %>
-						<% } %>
-						<% } %>
+					<% if(chosenAnswer.length === 0){ %>
+					<div class="form-check">
+						<input class="form-check-input" type="radio" value="<%=answers[i].id%>" name="ans">
+						<label class="form-check-label" for="defaultCheck1">
+							<%= answers[i].content%>
+						</label>
+					</div>
+					<% } else { %>
+					<% for(let j=0; j< chosenAnswer.length; j++) {%>
+					<% if(answers[i].id === chosenAnswer[j].answer_id){ %>
+					<div class="form-check">
+						<input class="form-check-input" type="radio" checked="checked" value="<%=answers[i].id%>"
+							name="ans">
+						<label class="form-check-label" for="defaultCheck1">
+							<%= answers[i].content%>
+						</label>
+					</div>
+					<% } %>
+					<% } %>
+					<% for(let j = 0; j < notChosenAnswer.length; j++) { %>
+					<% if (answers[i].id === notChosenAnswer[j].id) { %>
+					<div class="form-check">
+						<input class="form-check-input" type="radio" value="<%=answers[i].id%>" name="ans">
+						<label class="form-check-label" for="defaultCheck1">
+							<%= answers[i].content%>
+						</label>
+					</div>
+					<% } %>
+					<% } %>
+					<% } %>
+					<% } %>
 					<% } %>
 					<button type="submit" class="btn btn-primary">Answer</button>
 				</form>
@@ -107,9 +105,13 @@
 				<button onclick="location.href='/quiz/<%=testId %>/<%=questionSet %>/<%=++y %>'" type="button"
 					class="btn btn-primary">Next</button>
 				<% } %>
+				<button onclick="location.href='/result/<%=testId %>/<%=questionSet %>'"
+					class="btn btn-primary">Submit</button>
+
 			</div>
 		</div>
 	</div>
 </body>
+
 
 </html>

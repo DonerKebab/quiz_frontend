@@ -105,9 +105,10 @@
 				<button onclick="location.href='/quiz/<%=testId %>/<%=questionSet %>/<%=++y %>'" type="button"
 					class="btn btn-primary">Next</button>
 				<% } %>
+				<% if (index == count) { %>
 				<button onclick="location.href='/result/<%=testId %>/<%=questionSet %>'"
 					class="btn btn-primary">Submit</button>
-
+				<% } %>
 			</div>
 		</div>
 	</div>

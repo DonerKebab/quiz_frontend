@@ -93,7 +93,7 @@
 					<% } %>
 					<% } %>
 					<% } %>
-					<button type="submit" class="btn btn-primary">Answer</button>
+					<button type="submit" class="btn btn-primary" id="go" disabled>Answer</button>
 				</form>
 				<hr>
 				<% var x = index; var y = index %>
@@ -112,6 +112,33 @@
 			</div>
 		</div>
 	</div>
+	<script >
+		var allowed = '<%=num_ans %>';
+		var checkbox = document.getElementsByClassName('form-check-input');
+		console.log(checkbox.length);
+	
+		for (var i = 0 ; i < checkbox.length; i++) {
+			checkbox[i].addEventListener('change' , allowToProceed , false);
+		}
+	
+		function allowToProceed(){
+			if(countCheckBox() != allowed)
+				document.getElementById('go').disabled = true;
+			else
+				document.getElementById('go').disabled = false;
+		}
+	
+		function countCheckBox(){
+			var count = 0;
+			for(var i=0; i<checkbox.length; i++){
+				if(checkbox[i].checked){
+					count++;
+				}
+			}
+			console.log(count);
+			return count;
+		}
+	</script>
 </body>
 
 

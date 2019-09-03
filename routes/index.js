@@ -1,7 +1,6 @@
-var express = require('express');
-var router = express.Router();
+var express = require('express')
+var router = express.Router()
 var utils = require("./utils")
-
 
 
 /* GET home page. */
@@ -10,6 +9,7 @@ router.use('/quiz/:testId/:setId/:index?', async (req, res, next) => {
 	let setId = req.params.setId
 	let testId = req.params.testId
 	let index = req.params.index
+
 	if (req.method === 'GET') {
 		let queryQuestion = `select * from (select ROW_NUMBER() OVER (ORDER BY id) n, * from tbl_question where question_set=${setId}) where n=${index}`
 		let question = await utils.selectDB(queryQuestion);
@@ -33,11 +33,24 @@ router.use('/quiz/:testId/:setId/:index?', async (req, res, next) => {
 		let queryGetNumberOfQuestion = `select count(id) c from tbl_question where question_set = ${setId}`
 		let count = await utils.getDB(queryGetNumberOfQuestion)
 
+		let queryGetNumberOfAnswer = `select num_ans from tbl_question where id = ${questionId}`
+		let numberOfAnswer = await utils.getDB(queryGetNumberOfAnswer)
+		
+		// console.log(checkQuestionInChoice);
+		// console.log(checkQuestionNotInChoice);
+		// console.log(numberOfAnswer.num_ans)
 
-		console.log(checkQuestionInChoice);
-		console.log(checkQuestionNotInChoice);
-
-		res.render('test', { chosenAnswer: checkQuestionInChoice, notChosenAnswer: checkQuestionNotInChoice, index: index, testId: testId, questionSet: setId, question: question[0], answers: answersBelong, count: count.c });
+		res.render('test', {
+			chosenAnswer: checkQuestionInChoice,
+			notChosenAnswer: checkQuestionNotInChoice,
+			index: index,
+			testId: testId,
+			questionSet: setId,
+			question: question[0],
+			answers: answersBelong,
+			count: count.c,
+			num_ans: numberOfAnswer.num_ans
+		});
 	}
 	if (req.method === 'POST') {
 		let questionId = req.body.questionId;
@@ -58,6 +71,13 @@ router.use('/quiz/:testId/:setId/:index?', async (req, res, next) => {
 		// get list is_correct of list answer
 		// save student's answer to tbl_choice
 		let isTrue;
+		// get index to next question
+		let nextQuestion = parseInt(req.body.index);
+		let queryGetNumberOfQuestion = `select count(id) c from tbl_question where question_set = ${setId}`
+		let count = await utils.getDB(queryGetNumberOfQuestion)
+
+		// console.log(answerPicked)
+
 		for (let i = 0; i < answerPicked.length; i++) {
 			let getListAnswers = `select * from tbl_answer where id = ${answerPicked[i]}`
 			let answersBelong = await utils.getDB(getListAnswers);
@@ -65,33 +85,37 @@ router.use('/quiz/:testId/:setId/:index?', async (req, res, next) => {
 			let queryChoice = `insert into tbl_choice (test_id, question_id, answer_id, is_correct) values(${testId}, ${questionId}, ${answerPicked[i]}, ${isTrue})`;
 			await utils.runDB(queryChoice);
 		}
-		// get index to next question
-		let nextQuestion = parseInt(req.body.index);
-		let queryQuestion = `select * from (select ROW_NUMBER() OVER (ORDER BY id) n, * from tbl_question where question_set=${setId}) where n=${++nextQuestion}`
-		let question = await utils.selectDB(queryQuestion);
-		if (question.length != 0) {
-			res.redirect("/quiz/" + testId + "/" + setId + "/" + nextQuestion++)
+		if (nextQuestion != count.c) {
+			res.redirect("/quiz/" + testId + "/" + setId + "/" + (nextQuestion + 1));
 		} else {
-			// if the current question is end of set, then calculate score
-			let queryCountFalseQuestion = `SELECT COUNT(question_id) as num_wrong_ans
-											FROM (SELECT DISTINCT question_id FROM tbl_choice WHERE is_correct = 0 and test_id=${testId})`;
-			let countFalseQuestion = await utils.selectDB(queryCountFalseQuestion);
-			let queryTotalQuestion = `select count(id) as total_question from tbl_question where question_set=${setId}`
-			let totalQuestion = await utils.selectDB(queryTotalQuestion);
-			let countTrueQuestion = totalQuestion[0].total_question - countFalseQuestion[0].num_wrong_ans;
-			let truePercent = (countTrueQuestion / totalQuestion[0].total_question).toFixed(4) * 100;
-			if (truePercent >= 70) {
-				let queryUpdateTest = `update tbl_test set status='true', score=${truePercent}, result='passed' where id=${testId}`;
-				await utils.runDB(queryUpdateTest);
-				res.send('passed: ' + truePercent + '%');
-			} else {
-				let queryUpdateTest = `update tbl_test set status='false', score=${truePercent}, result='failed' where id=${testId}`;
-				await utils.runDB(queryUpdateTest);
-				res.send('failed: ' + truePercent + '%');
-			}
+			res.redirect("/quiz/" + testId + "/" + setId + "/" + (nextQuestion));
 		}
+
 	}
 });
+
+
+router.use('/result/:testId/:setId', async (req, res, next) => {
+	let testId = parseInt(req.params.testId);
+	let setId = parseInt(req.params.setId);
+
+	let queryCountFalseQuestion = `SELECT COUNT(question_id) as num_wrong_ans FROM (SELECT DISTINCT question_id FROM tbl_choice WHERE is_correct = 0 and test_id=${testId})`;
+	let countFalseQuestion = await utils.selectDB(queryCountFalseQuestion);
+	let queryTotalQuestion = `select count(id) as total_question from tbl_question where question_set=${setId}`
+	let totalQuestion = await utils.selectDB(queryTotalQuestion);
+	let countTrueQuestion = totalQuestion[0].total_question - countFalseQuestion[0].num_wrong_ans;
+	let truePercent = (countTrueQuestion / totalQuestion[0].total_question).toFixed(4) * 100;
+	if (truePercent >= 70) {
+		let queryUpdateTest = `update tbl_test set status='true', score=${truePercent}, result='passed' where id=${testId}`;
+		await utils.runDB(queryUpdateTest);
+		res.send('passed: ' + truePercent + '%');
+	} else {
+		let queryUpdateTest = `update tbl_test set status='false', score=${truePercent}, result='failed' where id=${testId}`;
+		await utils.runDB(queryUpdateTest);
+		res.send('failed: ' + truePercent + '%');
+	}
+	// console.log(testId + ' ' + setId)
+})
 
 router.use('/take-quiz/:setId', async (req, res, next) => {
 	// create a new record in table tbl_test
